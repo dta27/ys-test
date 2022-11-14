@@ -19,6 +19,40 @@
 </main>
 <script type="text/javascript">
 
+
+  function getParams() {
+    const queryString = window.location.search
+    const parameters = new URLSearchParams(queryString)
+    const signatureLink = parameters.get('url')
+    if (signatureLink) {
+      const ys = YS.init({
+        signatureLink: document.getElementById('url-search').value,
+        iframeContainer: 'iframe-container',
+      });
+
+      ys.onStart((data) => {
+        console.warn('onStart event triggered');
+        console.log(data);
+      });
+
+      ys.onError((data) => {
+        console.error('onError event triggered');
+        console.log(data);
+      });
+
+      ys.onSuccess((data) => {
+        console.log('onSuccess event triggered');
+        console.log(data);
+      });
+    }
+  }
+
+  window.onload = getParams
+
+  function submit() {
+    document.getElementById('iframe-window').src = document.getElementById('url-search').value
+  }
+
   function submit() {
     const ys = YS.init({
       signatureLink: document.getElementById('url-search').value,

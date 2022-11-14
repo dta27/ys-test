@@ -9,47 +9,58 @@ const YS = {
       get: (searchParams, prop) => searchParams.get(prop),
     });
 
-    const iFrame = () => {
-      const existingIframe = document.getElementById('ys-iframe');
-      if (!existingIframe) {
-        const iFrame = document.createElement('iframe');
-        iFrame.src = params.signatureLink;
-        iFrame.id = 'ys-iframe';
+    const iFrame = document.getElementById('yousign-iframe')
+      ? document.getElementById('yousign-iframe')
+      : document.createElement('iframe');
 
-        document.getElementById(params.iframeContainer).appendChild(iFrame);
+    iFrame.src = params.signatureLink;
+    iFrame.id = 'yousign-iframe';
 
-        return iFrame;
-      } else {
-        return existingIframe;
-      }
-    };
+    document.getElementById(params.iframeContainer).appendChild(iFrame);
 
     window.addEventListener('message', (event) => {
-      this.receiveMessage(event, urlParams);
+      YS.receiveMessage(event, urlParams);
     }, false);
 
     return {
-
-      onStart: function () {
-
+      onStart: function (fn) {
+        YS.eventCallbacks.started = fn;
       },
 
-      onSuccess: function () {
-
+      onSuccess: function (fn) {
+        YS.eventCallbacks.success = fn;
       },
 
-      onError: function () {
-
+      onError: function (fn) {
+        YS.eventCallbacks.error = fn;
       }
     }
   },
+
+  eventCallbacks: {},
 
   /*
    * @param {MessageEvent} event
    * @param {object} urlParams
    */
   receiveMessage: (event, urlParams) => {
-    console.log(event.message);
+    const { origin, data } = event;
+    console.log(event.data);
+    console.log(urlParams.k);
+
+    if (origin === 'https://mt-kalos-mt-iframe-app.yousign.tech') {
+      if(data.type === 'yousign'
+        && YS.eventCallbacks[data.event]
+        && typeof YS.eventCallbacks[data.event] === 'function'
+      ) {
+        YS.eventCallbacks[data.event](data);
+      }
+    }
+
+    if (data.type === '__ubble' && data.payload.redirectUrl) {
+      // handle Ubble Callback
+      document.getElementById('yousign-iframe').src = `${e.data.payload.redirectUrl}&k=${urlParams.k}`
+    }
   },
 
   /*windowListener: function (e, urlParams) {
