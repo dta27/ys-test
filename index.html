@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YS</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="script.js"></script>
+</head>
+<body>
+<header id="header"><h1>Demo Iframe</h1></header>
+<main>
+    <div class="search-bar-container" data-form-type="">
+        <input id="url-search" type="url" placeholder="Enter a url" data-form-type="" />
+        <button onclick="submit()" data-form-type="">Render iframe</button>
+    </div>
+    <div class="iframe-container" id="iframe-container"></div>
+</main>
+<script type="text/javascript">
+
+  function submit() {
+    const ys = YS.init({
+      signatureLink: document.getElementById('url-search').value,
+      iframeContainer: 'iframe-container',
+    });
+
+    ys.onStart((data) => {
+      console.warn('onStart event triggered');
+      console.log(data);
+    });
+
+    ys.onError((data) => {
+      console.error('onError event triggered');
+      console.log(data);
+    });
+
+    ys.onSuccess((data) => {
+      console.log('onSuccess event triggered');
+      console.log(data);
+    });
+  }
+</script>
+</body>
+</html>
