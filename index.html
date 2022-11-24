@@ -25,12 +25,12 @@
     const parameters = new URLSearchParams(queryString)
     const signatureLink = parameters.get('url')
     if (signatureLink) {
-      const ys = YS.init({
+      const ys = new Yousign({
         signatureLink: document.getElementById('url-search').value,
-        iframeContainer: 'iframe-container',
+        iframeContainerId: 'iframe-container',
       });
 
-      ys.onStart((data) => {
+      ys.onStarted((data) => {
         console.warn('onStart event triggered');
         console.log(data);
       });
@@ -54,12 +54,12 @@
   }
 
   function submit() {
-    const ys = YS.init({
+    const ys = new Yousign({
       signatureLink: document.getElementById('url-search').value,
-      iframeContainer: 'iframe-container',
+      iframeContainerId: 'iframe-container',
     });
 
-    ys.onStart((data) => {
+    ys.onStarted((data) => {
       console.warn('onStart event triggered');
       console.log(data);
     });

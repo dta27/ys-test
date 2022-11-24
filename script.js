@@ -1,82 +1,69 @@
-const YS = {
+class Yousign {
+  #eventCallbacks = {};
+
   /*
   * @param {string} signatureLink
-  * @param {string} iframeContainer
+  * @param {string} iframeContainerId
   */
-  init: (params) => {
-
+  constructor(params) {
     const urlParams = new Proxy(new URLSearchParams(params.signatureLink), {
       get: (searchParams, prop) => searchParams.get(prop),
     });
 
-    const iFrame = document.getElementById('yousign-iframe')
-      ? document.getElementById('yousign-iframe')
-      : document.createElement('iframe');
+    let iFrame = document.getElementById('yousign-iframe');
+
+    if (!iFrame) {
+      iFrame = document.createElement('iframe');
+      iFrame.id = 'yousign-iframe';
+      document.getElementById(params.iframeContainerId).appendChild(iFrame);
+    }
 
     iFrame.src = params.signatureLink;
-    iFrame.id = 'yousign-iframe';
-
-    document.getElementById(params.iframeContainer).appendChild(iFrame);
 
     window.addEventListener('message', (event) => {
-      YS.receiveMessage(event, urlParams);
+      this.#receiveMessage(event, urlParams);
     }, false);
+  }
 
-    return {
-      onStart: function (fn) {
-        YS.eventCallbacks.started = fn;
-      },
+  /*
+   * @param {function} fn
+   */
+  onStarted(fn) {
+    this.#eventCallbacks.started = fn;
+  }
 
-      onSuccess: function (fn) {
-        YS.eventCallbacks.success = fn;
-      },
+  /*
+   * @param {function} fn
+   */
+  onSuccess(fn) {
+    this.#eventCallbacks.success = fn;
+  }
 
-      onError: function (fn) {
-        YS.eventCallbacks.error = fn;
-      }
-    }
-  },
-
-  eventCallbacks: {},
+  /*
+   * @param {function} fn
+   */
+  onError(fn) {
+    this.#eventCallbacks.error = fn;
+  }
 
   /*
    * @param {MessageEvent} event
    * @param {object} urlParams
    */
-  receiveMessage: (event, urlParams) => {
-    const { origin, data } = event;
-    console.log(event.data);
-    console.log(urlParams.k);
+  #receiveMessage(event, urlParams) {
+    const { data } = event;
 
-    if (origin === 'https://mt-kalos-mt-iframe-app.yousign.tech') {
-      if(data.type === 'yousign'
-        && YS.eventCallbacks[data.event]
-        && typeof YS.eventCallbacks[data.event] === 'function'
-      ) {
-        YS.eventCallbacks[data.event](data);
-      }
+    console.log(event);
+
+    if(data.type === 'yousign'
+      && this.#eventCallbacks[data.event]
+      && typeof this.#eventCallbacks[data.event] === 'function'
+    ) {
+      this.#eventCallbacks[data.event](data);
     }
 
     if (data.type === '__ubble' && data.payload.redirectUrl) {
-      // handle Ubble Callback
-      document.getElementById('yousign-iframe').src = `${e.data.payload.redirectUrl}&k=${urlParams.k}`
+      document.getElementById('yousign-iframe').src = `${e.data.payload.redirectUrl}&k=${urlParams.k}`;
     }
-  },
-
-  /*windowListener: function (e, urlParams) {
-      const data = e[e.message ? 'message' : 'data']
-
-      if (
-          data.type === 'yousign' &&
-          yousign.callbacks[data.event] &&
-          typeof yousign.callbacks[data.event === 'function']
-      ) {
-          yousign.callbacks[data.event](data)
-      }
-
-      if (data.type === '__ubble' && data.payload.redirectUrl) {
-          // handle Ubble Callback
-          document.getElementById('yousign-iframe').src = `${e.data.payload.redirectUrl}&k=${urlParams.k}`
-      }
-  },*/
+  }
 }
