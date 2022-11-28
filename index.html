@@ -6,57 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>YS</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.yousign.tech/iframe-sdk-1.0.0.min.js"></script>
+    <script src="https://cdn.yousign.tech/iframe-sdk-1.1.0-rc.1.js"></script>
 </head>
 <body>
 <header id="header"><h1>Demo Iframe</h1></header>
 <main>
-    <div class="search-bar-container" data-form-type="">
-        <input id="url-search" type="url" placeholder="Enter a url" data-form-type="" />
-        <button onclick="submit()" data-form-type="">Render iframe</button>
+    <div class="search-bar-container">
+        <input id="url-search" type="url" placeholder="Enter a url" />
+        <button onclick="submit()">Render iframe</button>
+    </div>
+    <div class="options-bar-container">
+        isSandbox <input type="checkbox" id="is-sandbox" />
     </div>
     <div class="iframe-container" id="iframe-container"></div>
 </main>
 <script type="text/javascript">
 
-
-  function getParams() {
-    const queryString = window.location.search
-    const parameters = new URLSearchParams(queryString)
-    const signatureLink = parameters.get('url')
-    if (signatureLink) {
-      const ys = new Yousign({
-        signatureLink: document.getElementById('url-search').value,
-        iframeContainerId: 'iframe-container',
-      });
-
-      ys.onStarted((data) => {
-        console.warn('onStart event triggered');
-        console.log(data);
-      });
-
-      ys.onError((data) => {
-        console.error('onError event triggered');
-        console.log(data);
-      });
-
-      ys.onSuccess((data) => {
-        console.log('onSuccess event triggered');
-        console.log(data);
-      });
-    }
-  }
-
-  window.onload = getParams
-
-  function submit() {
-    document.getElementById('iframe-window').src = document.getElementById('url-search').value
-  }
-
   function submit() {
     const ys = new Yousign({
       signatureLink: document.getElementById('url-search').value,
       iframeContainerId: 'iframe-container',
+      isSandbox: document.getElementById('is-sandbox').checked,
     });
 
     ys.onStarted((data) => {
